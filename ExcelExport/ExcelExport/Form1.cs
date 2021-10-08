@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Reflection;
 using System;
+using System.Drawing;
 
 namespace ExcelExport
 {
@@ -16,6 +17,7 @@ namespace ExcelExport
         Excel.Application xlApp;
         Excel.Workbook xlWB;
         Excel.Worksheet xlSheet;
+        string[] headers;
 
         public Form1()
         {
@@ -24,10 +26,10 @@ namespace ExcelExport
             dataGridView1.DataSource = lakasok;
             CreateExcel();
             CreateTable();
-          
+            FormatTable();
         }
 
-        public void LoadData() 
+        public void LoadData()
         {
             lakasok = context.Flats.ToList();
         }
@@ -39,7 +41,7 @@ namespace ExcelExport
                 xlApp = new Excel.Application();
                 xlWB = xlApp.Workbooks.Add(Missing.Value);
                 xlSheet = xlWB.ActiveSheet;
-
+                
 
                 //...
 
@@ -57,12 +59,12 @@ namespace ExcelExport
                 xlWB = null;
                 xlApp = null;
             }
-            
+
         }
 
         private void CreateTable()
         {
-            string[] headers = new string[]
+            headers = new string[]
             {
               "Kód",
               "Eladó",
@@ -76,9 +78,9 @@ namespace ExcelExport
             };
 
             for (int i = 0; i < headers.Length; i++)
-                xlSheet.Cells[1, i+1] = headers[i];
+                xlSheet.Cells[1, i + 1] = headers[i];
 
-            object[,] values = new object[lakasok.Count,headers.Length];
+            object[,] values = new object[lakasok.Count, headers.Length];
 
             int counter = 0;
             int floorColumn = 6;
@@ -123,6 +125,22 @@ namespace ExcelExport
             ExcelCoordinate += x.ToString();
 
             return ExcelCoordinate;
+        }
+
+        private void FormatTable()
+        {
+            Excel.Range headerRange = xlSheet.get_Range(GetCell(1, 1), GetCell(1, headers.Length));
+            headerRange.Font.Bold = true;
+            headerRange.VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+            headerRange.HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+            headerRange.EntireColumn.AutoFit();
+            headerRange.RowHeight = 40;
+            headerRange.Interior.Color = Color.LightBlue;
+            headerRange.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
+
+            int lastRowID = xlSheet.UsedRange.Rows.Count;
+            Excel.Range completeTable = xlSheet.get_Range(GetCell(1, 1), GetCell(lastRowID, headers.Length));
+            completeTable.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
         }
     }
 }
