@@ -43,8 +43,6 @@ namespace ExcelExport
                 xlSheet = xlWB.ActiveSheet;
                 
 
-                //...
-
                 xlApp.Visible = true;
                 xlApp.UserControl = true;
 
@@ -141,6 +139,14 @@ namespace ExcelExport
             int lastRowID = xlSheet.UsedRange.Rows.Count;
             Excel.Range completeTable = xlSheet.get_Range(GetCell(1, 1), GetCell(lastRowID, headers.Length));
             completeTable.BorderAround2(Excel.XlLineStyle.xlContinuous, Excel.XlBorderWeight.xlThick);
+
+            Excel.Range firstColumn = xlSheet.get_Range(GetCell(2,1), GetCell(lastRowID, 1));
+            firstColumn.Font.Bold = true;
+            firstColumn.Interior.Color = Color.LightYellow;
+
+            Excel.Range lastColumn = xlSheet.get_Range(GetCell(2,headers.Length), GetCell(lastRowID,headers.Length));
+            lastColumn.Interior.Color = Color.LightGreen;
+            lastColumn.NumberFormat = "### ###.00";
         }
     }
 }
