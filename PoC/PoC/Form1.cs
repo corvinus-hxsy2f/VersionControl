@@ -1,4 +1,5 @@
-﻿using PoC.MnbServiceReference;
+﻿using PoC.Entities;
+using PoC.MnbServiceReference;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,11 +14,17 @@ namespace PoC
 {
     public partial class Form1 : Form
     {
+
+        BindingList<RateData> Rates = new BindingList<RateData>();
+        
+
         public Form1()
         {
             InitializeComponent();
 
             GetWebService();
+
+            dataGridView1.DataSource = Rates;
         }
 
         public void GetWebService()
@@ -31,9 +38,9 @@ namespace PoC
                 endDate = "2020-06-30"
             };
             var response = mnbService.GetExchangeRates(request);
-            var result = response.GetExchangeRatesResult;
-           
-
+            var result = response.GetExchangeRatesResult;        
         }
+
+
     }
 }
