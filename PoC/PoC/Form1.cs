@@ -24,6 +24,12 @@ namespace PoC
         {
             InitializeComponent();
 
+            RefreshData();
+        }
+
+        private void RefreshData()
+        {
+            Rates.Clear();
             string xmlstring = GetWebService();
             LoadXML(xmlstring);
             dataGridView1.DataSource = Rates;
@@ -59,9 +65,9 @@ namespace PoC
 
             var request = new GetExchangeRatesRequestBody()
             {
-                currencyNames = "EUR",
-                startDate = "2020-01-01",
-                endDate = "2020-06-30"
+                currencyNames = comboBox1.SelectedItem.ToString(),
+                startDate = dateTimePicker1.Value.ToString("yyyy-MM-dd"),
+                endDate = dateTimePicker2.Value.ToString("yyyy-MM-dd")
             };
             var response = mnbService.GetExchangeRates(request);
             string result = response.GetExchangeRatesResult;
@@ -87,5 +93,10 @@ namespace PoC
             chartArea.AxisY.IsStartedFromZero = false;
         }
 
+
+        private void filterChanged(object sender, EventArgs e)
+        {
+            RefreshData();
+        }
     }
 }
