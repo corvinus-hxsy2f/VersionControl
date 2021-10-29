@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,17 +19,32 @@ namespace PoC
     {
 
         BindingList<RateData> Rates = new BindingList<RateData>();
+        BindingList<string> currencies = new BindingList<string>();
 
 
         public Form1()
         {
             InitializeComponent();
+            comboBox1.DataSource = currencies;
+            var mnbService = new MNBArfolyamServiceSoapClient();
+
+            var request = new GetCurrenciesRequestBody();
+            var response = mnbService.GetCurrencies(request);
+            string result = response.GetCurrenciesResult;
+            XmlDocument vxml = new XmlDocument();
+            vxml.LoadXml(result);
+
+            foreach (XmlElement item in vxml.DocumentElement.FirstChild.ChildNodes)
+            {
+                currencies.Add(item.InnerText);
+            }
 
             RefreshData();
         }
 
         private void RefreshData()
         {
+            if (comboBox1.SelectedItem == null) return;
             Rates.Clear();
             string xmlstring = GetWebService();
             LoadXML(xmlstring);
@@ -43,13 +59,15 @@ namespace PoC
 
             foreach (XmlElement element in xml.DocumentElement)
             {
-
+               
                 var rate = new RateData();
                 Rates.Add(rate);
 
                 rate.Date = DateTime.Parse(element.GetAttribute("date"));
 
                 var childElement = (XmlElement)element.ChildNodes[0];
+                if (childElement == null)
+                    continue;
                 rate.Currency = childElement.GetAttribute("curr");
 
                 var unit = decimal.Parse(childElement.GetAttribute("unit"));
