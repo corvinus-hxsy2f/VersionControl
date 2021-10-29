@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 
 namespace PoC
 {
@@ -21,13 +22,36 @@ namespace PoC
         public Form1()
         {
             InitializeComponent();
-
-            GetWebService();
-
+    
+            string xmlstring = GetWebService();
+            LoadXML(xmlstring);
             dataGridView1.DataSource = Rates;
         }
 
-        public void GetWebService()
+        private void LoadXML(string input)
+        {
+            var xml = new XmlDocument();
+            xml.LoadXml(input);
+
+            foreach (XmlElement element in xml.DocumentElement)
+            {
+                
+                var rate = new RateData();
+                Rates.Add(rate);
+
+                rate.Date = DateTime.Parse(element.GetAttribute("date"));
+
+                var childElement = (XmlElement)element.ChildNodes[0];
+                rate.Currency = childElement.GetAttribute("curr");
+
+                var unit = decimal.Parse(childElement.GetAttribute("unit"));
+                var value = decimal.Parse(childElement.InnerText);
+                if (unit != 0)
+                    rate.Value = value / unit;
+            }
+        }
+
+        private string GetWebService()
         {
             var mnbService = new MNBArfolyamServiceSoapClient();
 
@@ -38,7 +62,8 @@ namespace PoC
                 endDate = "2020-06-30"
             };
             var response = mnbService.GetExchangeRates(request);
-            var result = response.GetExchangeRatesResult;        
+            string result = response.GetExchangeRatesResult;
+            return result;
         }
 
 
