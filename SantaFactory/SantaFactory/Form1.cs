@@ -35,8 +35,8 @@ namespace SantaFactory
         {
             var ball = Factory.CreateNew();
             _balls.Add(ball);
-            ball.Left = -ball.Width;
             mainPanel.Controls.Add(ball);
+            ball.Left = -ball.Width;
         }
 
         private void conveyorTimer_Tick(object sender, EventArgs e)
