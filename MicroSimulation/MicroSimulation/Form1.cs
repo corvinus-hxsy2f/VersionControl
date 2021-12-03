@@ -156,6 +156,18 @@ namespace MicroSimulation
         {
             StartSimulation((int)nudYear.Value, txtPath.Text);
         }
+
+        private void btnBrowse_Click(object sender, EventArgs e)
+        {
+            var ofd = new OpenFileDialog();
+            ofd.FileName = txtPath.Text;
+
+            if (ofd.ShowDialog != DialogResult.OK)            
+                return;
+
+            txtPath.Text = ofd.FileName;
+            
+         }
     }
 }
    
