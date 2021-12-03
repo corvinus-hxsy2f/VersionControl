@@ -12,7 +12,7 @@ using System.Windows.Forms;
 
 namespace MicroSimulation
 {
-    public partial class Form1 : Form
+    public partial class Microsimulation : Form
     {
         Random rng = new Random(1234);
 
@@ -20,15 +20,21 @@ namespace MicroSimulation
         List<BirthProbability> BirthProbabilities = null;
         List<DeathProbability> DeathProbabilities = null;
 
-        public Form1()
+        public Microsimulation()
         {
             InitializeComponent();
 
-            Population = GetPopulation(@"C:\Temp\nép-teszt.csv");
+
             BirthProbabilities = GetBirthProbabilities(@"C:\Temp\születés.csv");
             DeathProbabilities = GetDeathProbabilities(@"C:\Temp\halál.csv");
+            
+        }
 
-            for (int year = 2005; year <= 2024; year++)
+        private void StartSimulation(int endYear, string csvPath)
+        {
+            Population = GetPopulation(csvPath);
+
+            for (int year = 2005; year <= endYear; year++)
             {
                 for (int i = 0; i < Population.Count; i++)
                     SimStep(year, Population[i]);
@@ -39,8 +45,10 @@ namespace MicroSimulation
                 int nbrOfFemales = (from x in Population
                                     where x.Gender == Gender.Female && x.IsAlive
                                     select x).Count();
-                Console.WriteLine(
-                    string.Format("Év:{0} Fiúk:{1} Lányok:{2}", year, nbrOfMales, nbrOfFemales));
+                txtMain.Text += string.Format("Szimulációs év:{0}\n\t Fiúk:{1}\n\t Lányok:{2}\n",
+                    year, 
+                    
+                    nbrOfMales, nbrOfFemales);
             }
         }
 
@@ -142,6 +150,11 @@ namespace MicroSimulation
             }
 
             return deathProbabilities;
+        }
+
+        private void btnStart_Click(object sender, EventArgs e)
+        {
+            StartSimulation((int)nudYear.Value, txtPath.Text);
         }
     }
 }
